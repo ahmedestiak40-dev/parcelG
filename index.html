@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParcelFlow Pro | Professional Parcel Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+            color: var(--secondary);
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background-color: var(--secondary);
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--light);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        /* Main Content Area */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .content-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-header h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+        
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card.in-transit i { color: var(--secondary); }
+        .stat-card.delivered i { color: var(--success); }
+        .stat-card.pending i { color: var(--warning); }
+        .stat-card.returned i { color: var(--accent); }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Tracking Section */
+        .tracking-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tracking-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .tracking-result {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .tracking-result.active {
+            display: block;
+        }
+        
+        .parcel-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-weight: 600;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--secondary);
+        }
+        
+        .timeline-event {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -23px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            border: 2px solid white;
+        }
+        
+        .timeline-event.active::before {
+            background-color: var(--success);
+        }
+        
+        .event-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .event-description {
+            font-weight: 500;
+            margin: 5px 0;
+        }
+        
+        .event-location {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Parcels Table */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-received { background-color: #d1ecf1; color: #0c5460; }
+        .status-in-transit { background-color: #cce7ff; color: #004085; }
+        .status-out-for-delivery { background-color: #d4edda; color: #155724; }
+        .status-delivered { background-color: #d4edda; color: #155724; }
+        .status-returned { background-color: #f8d7da; color: #721c24; }
+        
+        /* Analytics */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            height: 300px;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ddd;
+            font-size: 0.9rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--secondary);
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-box-open"></i>
+                    <h1>ParcelFlow Pro</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-section="dashboard">Dashboard</a></li>
+                        <li><a href="#" class="nav-link" data-section="parcels">Parcels</a></li>
+                        <li><a href="#" class="nav-link" data-section="tracking">Tracking</a></li>
+                        <li><a href="#" class="nav-link" data-section="analytics">Analytics</a></li>
+                        <li><a href="#" class="nav-link" data-section="customers">Customers</a></li>
+                        <li><a href="#" class="nav-link" data-section="settings">Settings</a></li>
+                    </ul>
+                </nav>
+                <div class="user-actions">
+                    <button class="btn btn-outline"><i class="fas fa-bell"></i></button>
+                    <button class="btn btn-outline"><i class="fas fa-cog"></i></button>
+                    <button class="btn btn-primary"><i class="fas fa-user"></i> Admin</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard">
+            <aside class="sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="sidebar-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" class="sidebar-link" data-section="parcels"><i class="fas fa-box"></i> All Parcels</a></li>
+                    <li><a href="#" class="sidebar-link" data-section="create-parcel"><i class="fas fa-plus-circle"></i> Create Parcel</a></li>
+                    <li><a href="#" class="sidebar-link" data-section="tracking"><i class="fas fa-search"></i> Track Parcel</a></li>
+                    <li><a href="#" class="sidebar-link" data-section="analytics"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+                    <li><a href="#" class="sidebar-link" data-section="customers"><i class="fas fa-users"></i> Customers</a></li>
+                    <li><a href="#" class="sidebar-link" data-section="couriers"><i class="fas fa-truck"></i> Couriers</a></li>
+                    <li><a href="#" class="sidebar-link" data-section="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </aside>
+
+            <div class="content">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h2>Today's Overview</h2>
+                        <span id="current-date">July 12, 2024</span>
+                    </div>
+                    <div class="stats-cards">
+                        <div class="stat-card in-transit">
+                            <i class="fas fa-shipping-fast"></i>
+                            <div class="stat-value" id="stat-in-transit">142</div>
+                            <div class="stat-label">In Transit</div>
+                        </div>
+                        <div class="stat-card delivered">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-value" id="stat-delivered">89</div>
+                            <div class="stat-label">Delivered</div>
+                        </div>
+                        <div class="stat-card pending">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-value" id="stat-pending">23</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                        <div class="stat-card returned">
+                            <i class="fas fa-undo"></i>
+                            <div class="stat-value" id="stat-returned">7</div>
+                            <div class="stat-label">Returned</div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Recent Parcels</h2>
+                        <button class="btn btn-primary" id="view-all-parcels">View All</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tracking #</th>
+                                    <th>Sender</th>
+                                    <th>Recipient</th>
+                                    <th>Status</th>
+                                    <th>Last Update</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-parcels-table">
+                                <!-- Recent parcels will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- All Parcels Section -->
+                <section id="parcels" class="content-section">
+                    <div class="section-header">
+                        <h2>All Parcels</h2>
+                        <div>
+                            <input type="text" id="search-parcels" placeholder="Search parcels...">
+                            <button class="btn btn-primary" id="create-parcel-btn">Create New Parcel</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tracking #</th>
+                                    <th>Sender</th>
+                                    <th>Recipient</th>
+                                    <th>Service</th>
+                                    <th>Status</th>
+                                    <th>Last Update</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-parcels-table">
+                                <!-- All parcels will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Tracking Section -->
+                <section id="tracking" class="content-section">
+                    <div class="section-header">
+                        <h2>Parcel Tracking</h2>
+                    </div>
+                    <div class="tracking-input">
+                        <input type="text" id="tracking-number" placeholder="Enter tracking number (e.g., PF2407120001)">
+                        <button class="btn btn-primary" id="track-btn">Track Parcel</button>
+                    </div>
+                    <div class="tracking-result" id="tracking-result">
+                        <div class="section-header">
+                            <h3>Tracking Details for <span id="result-tracking-number">PF2407120001</span></h3>
+                            <div class="status-badge status-in-transit" id="result-status">In Transit</div>
+                        </div>
+                        
+                        <div class="parcel-info">
+                            <div class="info-item">
+                                <div class="info-label">Sender</div>
+                                <div class="info-value" id="info-sender">John Smith</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Recipient</div>
+                                <div class="info-value" id="info-recipient">Sarah Johnson</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Weight</div>
+                                <div class="info-value" id="info-weight">2.5 kg</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Service</div>
+                                <div class="info-value" id="info-service">Express Delivery</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Est. Delivery</div>
+                                <div class="info-value" id="info-delivery">July 15, 2024</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Cost</div>
+                                <div class="info-value" id="info-cost">$24.50</div>
+                            </div>
+                        </div>
+                        
+                        <h4>Tracking History</h4>
+                        <div class="timeline" id="timeline">
+                            <!-- Timeline events will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Create Parcel Section -->
+                <section id="create-parcel" class="content-section">
+                    <div class="section-header">
+                        <h2>Create New Parcel</h2>
+                    </div>
+                    <form id="parcel-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sender-name">Sender Name *</label>
+                                <input type="text" id="sender-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sender-phone">Sender Phone</label>
+                                <input type="tel" id="sender-phone">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sender-address">Sender Address *</label>
+                            <textarea id="sender-address" required></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="recipient-name">Recipient Name *</label>
+                                <input type="text" id="recipient-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="recipient-phone">Recipient Phone</label>
+                                <input type="tel" id="recipient-phone">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="recipient-address">Recipient Address *</label>
+                            <textarea id="recipient-address" required></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="parcel-weight">Weight (kg) *</label>
+                                <input type="number" id="parcel-weight" step="0.1" min="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="parcel-dimensions">Dimensions (LxWxH in cm)</label>
+                                <input type="text" id="parcel-dimensions" placeholder="e.g., 20x15x10">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="service-type">Service Type *</label>
+                                <select id="service-type" required>
+                                    <option value="">Select Service</option>
+                                    <option value="standard">Standard Delivery</option>
+                                    <option value="express">Express Delivery</option>
+                                    <option value="overnight">Overnight Delivery</option>
+                                    <option value="international">International</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="insurance">Insurance Value ($)</label>
+                                <input type="number" id="insurance" min="0" step="0.01">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="special-instructions">Special Instructions</label>
+                            <textarea id="special-instructions"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Create Parcel</button>
+                            <button type="button" class="btn btn-outline" id="calculate-cost">Calculate Cost</button>
+                            <span id="cost-display" style="margin-left: 15px; font-weight: bold;"></span>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analytics" class="content-section">
+                    <div class="section-header">
+                        <h2>Analytics</h2>
+                        <div>
+                            <select id="analytics-period">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option selected>Last 90 days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <canvas id="deliveryChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <i class="fas fa-box"></i>
+                            <div class="stat-value" id="total-parcels">261</div>
+                            <div class="stat-label">Total Parcels</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div class="stat-value" id="total-revenue">$5,247.80</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-stopwatch"></i>
+                            <div class="stat-value" id="avg-delivery-time">2.3</div>
+                            <div class="stat-label">Avg Delivery (Days)</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-percentage"></i>
+                            <div class="stat-value" id="delivery-rate">96.5%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Customers Section -->
+                <section id="customers" class="content-section">
+                    <div class="section-header">
+                        <h2>Customers</h2>
+                        <button class="btn btn-primary" id="add-customer-btn">Add Customer</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Parcels Sent</th>
+                                    <th>Last Activity</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-table">
+                                <!-- Customers will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Couriers Section -->
+                <section id="couriers" class="content-section">
+                    <div class="section-header">
+                        <h2>Couriers</h2>
+                        <button class="btn btn-primary" id="add-courier-btn">Add Courier</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Vehicle</th>
+                                    <th>Phone</th>
+                                    <th>Active Deliveries</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="couriers-table">
+                                <!-- Couriers will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="content-section">
+                    <div class="section-header">
+                        <h2>Settings</h2>
+                    </div>
+                    <div class="tabs">
+                        <div class="tab active" data-tab="general">General</div>
+                        <div class="tab" data-tab="notifications">Notifications</div>
+                        <div class="tab" data-tab="shipping">Shipping</div>
+                        <div class="tab" data-tab="users">Users</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="general-tab">
+                        <form id="general-settings">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="company-name">Company Name</label>
+                                    <input type="text" id="company-name" value="ParcelFlow Pro">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company-email">Company Email</label>
+                                    <input type="email" id="company-email" value="info@parcelflow.com">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="currency">Currency</label>
+                                    <select id="currency">
+                                        <option>USD ($)</option>
+                                        <option>EUR (€)</option>
+                                        <option>GBP (£)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="timezone">Timezone</label>
+                                    <select id="timezone">
+                                        <option>UTC-5 (Eastern Time)</option>
+                                        <option>UTC-6 (Central Time)</option>
+                                        <option>UTC-7 (Mountain Time)</option>
+                                        <option>UTC-8 (Pacific Time)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Save Settings</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="tab-content" id="notifications-tab">
+                        <h3>Notification Preferences</h3>
+                        <form id="notification-settings">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="email-notifications" checked> Email notifications for new parcels
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="sms-notifications" checked> SMS notifications for delivery updates
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="daily-reports"> Daily summary reports
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Save Preferences</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="tab-content" id="shipping-tab">
+                        <h3>Shipping Rates</h3>
+                        <form id="shipping-settings">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="base-rate">Base Rate ($)</label>
+                                    <input type="number" id="base-rate" value="5.00" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label for="weight-rate">Rate per kg ($)</label>
+                                    <input type="number" id="weight-rate" value="0.50" step="0.01">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="express-multiplier">Express Multiplier</label>
+                                    <input type="number" id="express-multiplier" value="1.5" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="overnight-multiplier">Overnight Multiplier</label>
+                                    <input type="number" id="overnight-multiplier" value="2.0" step="0.1">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Save Rates</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="tab-content" id="users-tab">
+                        <h3>User Management</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Last Login</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>John Admin</td>
+                                        <td>john@parcelflow.com</td>
+                                        <td>Administrator</td>
+                                        <td>Today, 09:24 AM</td>
+                                        <td>
+                                            <button class="btn btn-warning">Edit</button>
+                                            <button class="btn btn-danger">Delete</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sarah Manager</td>
+                                        <td>sarah@parcelflow.com</td>
+                                        <td>Manager</td>
+                                        <td>Yesterday, 03:45 PM</td>
+                                        <td>
+                                            <button class="btn btn-warning">Edit</button>
+                                            <button class="btn btn-danger">Delete</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" id="add-user-btn">Add User</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Success!</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="success-message">Operation completed successfully.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="success-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div class="modal" id="customer-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customer-modal-title">Add Customer</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="customer-form">
+                <div class="form-group">
+                    <label for="customer-name">Name *</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-email">Email *</label>
+                    <input type="email" id="customer-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone">Phone</label>
+                    <input type="tel" id="customer-phone">
+                </div>
+                <div class="form-group">
+                    <label for="customer-address">Address</label>
+                    <textarea id="customer-address"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Courier Modal -->
+    <div class="modal" id="courier-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="courier-modal-title">Add Courier</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="courier-form">
+                <div class="form-group">
+                    <label for="courier-name">Name *</label>
+                    <input type="text" id="courier-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="courier-phone">Phone *</label>
+                    <input type="tel" id="courier-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="courier-vehicle">Vehicle Type *</label>
+                    <select id="courier-vehicle" required>
+                        <option value="">Select Vehicle</option>
+                        <option value="bike">Bike</option>
+                        <option value="car">Car</option>
+                        <option value="van">Van</option>
+                        <option value="truck">Truck</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="courier-status">Status</label>
+                    <select id="courier-status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save Courier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ParcelFlow Pro</h3>
+                    <p>Professional parcel management software for businesses of all sizes. Streamline your shipping operations with our powerful tools.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Parcel Tracking</a></li>
+                        <li><a href="#">Create Shipment</a></li>
+                        <li><a href="#">Analytics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                        <li><a href="#">System Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Business Ave, Suite 100</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> support@parcelflow.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2024 ParcelFlow Pro. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data for demonstration
+        const sampleParcels = [
+            {
+                trackingNumber: "PF2407120001",
+                sender: "John Smith",
+                recipient: "Sarah Johnson",
+                status: "in-transit",
+                lastUpdate: "2024-07-12 10:30 AM",
+                weight: "2.5 kg",
+                service: "Express Delivery",
+                estDelivery: "July 15, 2024",
+                cost: "$24.50",
+                timeline: [
+                    { time: "2024-07-12 10:30 AM", description: "In transit to distribution center", location: "Springfield" },
+                    { time: "2024-07-11 02:15 PM", description: "Processed at facility", location: "Metro Hub" },
+                    { time: "2024-07-10 09:45 AM", description: "Parcel received", location: "Main Office" }
+                ]
+            },
+            {
+                trackingNumber: "PF2407120002",
+                sender: "Global Tech Inc",
+                recipient: "Mike Davis",
+                status: "delivered",
+                lastUpdate: "2024-07-12 09:15 AM",
+                weight: "1.2 kg",
+                service: "Standard Delivery",
+                estDelivery: "July 12, 2024",
+                cost: "$12.75",
+                timeline: [
+                    { time: "2024-07-12 09:15 AM", description: "Delivered", location: "Customer Address" },
+                    { time: "2024-07-12 08:30 AM", description: "Out for delivery", location: "Local Depot" },
+                    { time: "2024-07-11 04:20 PM", description: "Arrived at local facility", location: "City Distribution" },
+                    { time: "2024-07-10 11:10 AM", description: "Parcel received", location: "Main Office" }
+                ]
+            },
+            {
+                trackingNumber: "PF2407120003",
+                sender: "Alice Brown",
+                recipient: "Robert Wilson",
+                status: "pending",
+                lastUpdate: "2024-07-11 03:45 PM",
+                weight: "5.0 kg",
+                service: "Economy Delivery",
+                estDelivery: "July 18, 2024",
+                cost: "$18.90",
+                timeline: [
+                    { time: "2024-07-11 03:45 PM", description: "Parcel received", location: "Main Office" }
+                ]
+            },
+            {
+                trackingNumber: "PF2407120004",
+                sender: "Tech Solutions Ltd",
+                recipient: "Jennifer Lee",
+                status: "out-for-delivery",
+                lastUpdate: "2024-07-12 08:00 AM",
+                weight: "0.8 kg",
+                service: "Express Delivery",
+                estDelivery: "July 12, 2024",
+                cost: "$22.30",
+                timeline: [
+                    { time: "2024-07-12 08:00 AM", description: "Out for delivery", location: "Local Depot" },
+                    { time: "2024-07-11 10:15 PM", description: "Arrived at local facility", location: "City Distribution" },
+                    { time: "2024-07-11 02:30 PM", description: "In transit", location: "Regional Hub" },
+                    { time: "2024-07-10 04:20 PM", description: "Parcel received", location: "Main Office" }
+                ]
+            }
+        ];
+
+        const sampleCustomers = [
+            { id: 1, name: "John Smith", email: "john@example.com", phone: "+1 (555) 123-4567", parcels: 12, lastActivity: "2024-07-12" },
+            { id: 2, name: "Global Tech Inc", email: "orders@globaltech.com", phone: "+1 (555) 987-6543", parcels: 45, lastActivity: "2024-07-11" },
+            { id: 3, name: "Alice Brown", email: "alice@example.com", phone: "+1 (555) 456-7890", parcels: 3, lastActivity: "2024-07-10" },
+            { id: 4, name: "Tech Solutions Ltd", email: "shipping@techsolutions.com", phone: "+1 (555) 234-5678", parcels: 28, lastActivity: "2024-07-12" }
+        ];
+
+        const sampleCouriers = [
+            { id: 1, name: "Michael Johnson", vehicle: "Van", phone: "+1 (555) 111-2222", deliveries: 8, status: "active" },
+            { id: 2, name: "Sarah Williams", vehicle: "Car", phone: "+1 (555) 333-4444", deliveries: 5, status: "active" },
+            { id: 3, name: "David Miller", vehicle: "Bike", phone: "+1 (555) 555-6666", deliveries: 12, status: "active" },
+            { id: 4, name: "Emma Davis", vehicle: "Truck", phone: "+1 (555) 777-8888", deliveries: 3, status: "inactive" }
+        ];
+
+        // DOM elements
+        const trackBtn = document.getElementById('track-btn');
+        const trackingInput = document.getElementById('tracking-number');
+        const trackingResult = document.getElementById('tracking-result');
+        const recentParcelsTable = document.getElementById('recent-parcels-table');
+        const allParcelsTable = document.getElementById('all-parcels-table');
+        const customersTable = document.getElementById('customers-table');
+        const couriersTable = document.getElementById('couriers-table');
+        const parcelForm = document.getElementById('parcel-form');
+        const customerForm = document.getElementById('customer-form');
+        const courierForm = document.getElementById('courier-form');
+        const calculateCostBtn = document.getElementById('calculate-cost');
+        const costDisplay = document.getElementById('cost-display');
+        const addCustomerBtn = document.getElementById('add-customer-btn');
+        const addCourierBtn = document.getElementById('add-courier-btn');
+        const createParcelBtn = document.getElementById('create-parcel-btn');
+        const viewAllParcelsBtn = document.getElementById('view-all-parcels');
+        const successModal = document.getElementById('success-modal');
+        const customerModal = document.getElementById('customer-modal');
+        const courierModal = document.getElementById('courier-modal');
+        const successOkBtn = document.getElementById('success-ok');
+        const modalCloseBtns = document.querySelectorAll('.modal-close');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const searchParcels = document.getElementById('search-parcels');
+        const analyticsPeriod = document.getElementById('analytics-period');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Initialize data tables
+            populateRecentParcelsTable();
+            populateAllParcelsTable();
+            populateCustomersTable();
+            populateCouriersTable();
+            initializeCharts();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Show dashboard by default
+            showSection('dashboard');
+        });
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    setActiveNav(this);
+                });
+            });
+            
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    setActiveNav(this);
+                });
+            });
+            
+            // Tracking
+            trackBtn.addEventListener('click', trackParcel);
+            trackingInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    trackParcel();
+                }
+            });
+            
+            // Parcel creation
+            parcelForm.addEventListener('submit', createParcel);
+            calculateCostBtn.addEventListener('click', calculateCost);
+            
+            // Customer management
+            addCustomerBtn.addEventListener('click', function() {
+                document.getElementById('customer-modal-title').textContent = 'Add Customer';
+                customerForm.reset();
+                customerModal.classList.add('active');
+            });
+            
+            customerForm.addEventListener('submit', saveCustomer);
+            
+            // Courier management
+            addCourierBtn.addEventListener('click', function() {
+                document.getElementById('courier-modal-title').textContent = 'Add Courier';
+                courierForm.reset();
+                courierModal.classList.add('active');
+            });
+            
+            courierForm.addEventListener('submit', saveCourier);
+            
+            // Modal controls
+            successOkBtn.addEventListener('click', function() {
+                successModal.classList.remove('active');
+            });
+            
+            modalCloseBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('active');
+                });
+            });
+            
+            // Section navigation buttons
+            createParcelBtn.addEventListener('click', function() {
+                showSection('create-parcel');
+            });
+            
+            viewAllParcelsBtn.addEventListener('click', function() {
+                showSection('parcels');
+            });
+            
+            // Search functionality
+            searchParcels.addEventListener('input', filterParcels);
+            
+            // Analytics period change
+            analyticsPeriod.addEventListener('change', updateAnalytics);
+            
+            // Settings tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Settings forms
+            document.getElementById('general-settings').addEventListener('submit', saveGeneralSettings);
+            document.getElementById('notification-settings').addEventListener('submit', saveNotificationSettings);
+            document.getElementById('shipping-settings').addEventListener('submit', saveShippingSettings);
+        }
+
+        // Show/hide sections
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Set active navigation
+        function setActiveNav(activeElement) {
+            // Remove active class from all nav links
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Add active class to clicked element
+            activeElement.classList.add('active');
+        }
+
+        // Switch settings tabs
+        function switchTab(tabId) {
+            // Remove active class from all tabs and contents
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to selected tab and content
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+
+        // Populate tables with data
+        function populateRecentParcelsTable() {
+            recentParcelsTable.innerHTML = '';
+            
+            // Show only the first 5 parcels
+            sampleParcels.slice(0, 5).forEach(parcel => {
+                const row = createParcelRow(parcel);
+                recentParcelsTable.appendChild(row);
+            });
+        }
+
+        function populateAllParcelsTable() {
+            allParcelsTable.innerHTML = '';
+            
+            sampleParcels.forEach(parcel => {
+                const row = createParcelRow(parcel);
+                allParcelsTable.appendChild(row);
+            });
+        }
+
+        function createParcelRow(parcel) {
+            const row = document.createElement('tr');
+            
+            // Status badge based on parcel status
+            let statusClass = '';
+            let statusText = '';
+            
+            switch(parcel.status) {
+                case 'pending':
+                    statusClass = 'status-pending';
+                    statusText = 'Pending';
+                    break;
+                case 'received':
+                    statusClass = 'status-received';
+                    statusText = 'Received';
+                    break;
+                case 'in-transit':
+                    statusClass = 'status-in-transit';
+                    statusText = 'In Transit';
+                    break;
+                case 'out-for-delivery':
+                    statusClass = 'status-out-for-delivery';
+                    statusText = 'Out for Delivery';
+                    break;
+                case 'delivered':
+                    statusClass = 'status-delivered';
+                    statusText = 'Delivered';
+                    break;
+                case 'returned':
+                    statusClass = 'status-returned';
+                    statusText = 'Returned';
+                    break;
+            }
+            
+            row.innerHTML = `
+                <td>${parcel.trackingNumber}</td>
+                <td>${parcel.sender}</td>
+                <td>${parcel.recipient}</td>
+                <td>${parcel.service}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td>${parcel.lastUpdate}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm track-action" data-tracking="${parcel.trackingNumber}">Track</button>
+                    <button class="btn btn-warning btn-sm edit-action" data-tracking="${parcel.trackingNumber}">Edit</button>
+                </td>
+            `;
+            
+            // Add event listeners to action buttons
+            row.querySelector('.track-action').addEventListener('click', function() {
+                const trackingNumber = this.getAttribute('data-tracking');
+                showSection('tracking');
+                document.getElementById('tracking-number').value = trackingNumber;
+                trackParcelByNumber(trackingNumber);
+            });
+            
+            return row;
+        }
+
+        function populateCustomersTable() {
+            customersTable.innerHTML = '';
+            
+            sampleCustomers.forEach(customer => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${customer.id}</td>
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.parcels}</td>
+                    <td>${customer.lastActivity}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm edit-customer" data-id="${customer.id}">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-customer" data-id="${customer.id}">Delete</button>
+                    </td>
+                `;
+                
+                customersTable.appendChild(row);
+            });
+            
+            // Add event listeners to customer action buttons
+            document.querySelectorAll('.edit-customer').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const customerId = this.getAttribute('data-id');
+                    editCustomer(customerId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-customer').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const customerId = this.getAttribute('data-id');
+                    deleteCustomer(customerId);
+                });
+            });
+        }
+
+        function populateCouriersTable() {
+            couriersTable.innerHTML = '';
+            
+            sampleCouriers.forEach(courier => {
+                const row = document.createElement('tr');
+                
+                const statusClass = courier.status === 'active' ? 'status-delivered' : 'status-pending';
+                const statusText = courier.status === 'active' ? 'Active' : 'Inactive';
+                
+                row.innerHTML = `
+                    <td>${courier.id}</td>
+                    <td>${courier.name}</td>
+                    <td>${courier.vehicle}</td>
+                    <td>${courier.phone}</td>
+                    <td>${courier.deliveries}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-warning btn-sm edit-courier" data-id="${courier.id}">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-courier" data-id="${courier.id}">Delete</button>
+                    </td>
+                `;
+                
+                couriersTable.appendChild(row);
+            });
+            
+            // Add event listeners to courier action buttons
+            document.querySelectorAll('.edit-courier').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const courierId = this.getAttribute('data-id');
+                    editCourier(courierId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-courier').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const courierId = this.getAttribute('data-id');
+                    deleteCourier(courierId);
+                });
+            });
+        }
+
+        // Tracking functionality
+        function trackParcel() {
+            const trackingNumber = trackingInput.value.trim();
+            
+            if (!trackingNumber) {
+                alert('Please enter a tracking number');
+                return;
+            }
+            
+            trackParcelByNumber(trackingNumber);
+        }
+
+        function trackParcelByNumber(trackingNumber) {
+            // Find the parcel with the matching tracking number
+            const parcel = sampleParcels.find(p => p.trackingNumber === trackingNumber);
+            
+            if (parcel) {
+                showTrackingResult(parcel);
+            } else {
+                alert('Tracking number not found. Please try PF2407120001, PF2407120002, etc.');
+            }
+        }
+
+        // Display tracking results
+        function showTrackingResult(parcel) {
+            // Update tracking result section
+            document.getElementById('result-tracking-number').textContent = parcel.trackingNumber;
+            
+            // Update status badge
+            const statusElement = document.getElementById('result-status');
+            statusElement.textContent = getStatusText(parcel.status);
+            statusElement.className = 'status-badge ' + getStatusClass(parcel.status);
+            
+            // Update parcel info
+            document.getElementById('info-sender').textContent = parcel.sender;
+            document.getElementById('info-recipient').textContent = parcel.recipient;
+            document.getElementById('info-weight').textContent = parcel.weight;
+            document.getElementById('info-service').textContent = parcel.service;
+            document.getElementById('info-delivery').textContent = parcel.estDelivery;
+            document.getElementById('info-cost').textContent = parcel.cost;
+            
+            // Update timeline
+            const timelineElement = document.getElementById('timeline');
+            timelineElement.innerHTML = '';
+            
+            parcel.timeline.forEach((event, index) => {
+                const eventElement = document.createElement('div');
+                eventElement.className = `timeline-event ${index === 0 ? 'active' : ''}`;
+                
+                eventElement.innerHTML = `
+                    <div class="event-time">${event.time}</div>
+                    <div class="event-description">${event.description}</div>
+                    <div class="event-location"><i class="fas fa-map-marker-alt"></i> ${event.location}</div>
+                `;
+                
+                timelineElement.appendChild(eventElement);
+            });
+            
+            // Show the tracking result section
+            trackingResult.classList.add('active');
+            
+            // Scroll to the tracking result
+            trackingResult.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Parcel creation
+        function createParcel(e) {
+            e.preventDefault();
+            
+            // Generate tracking number
+            const now = new Date();
+            const trackingNumber = `PF${now.getFullYear().toString().substr(2,2)}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}${Math.floor(Math.random()*9000+1000)}`;
+            
+            // Create new parcel object
+            const newParcel = {
+                trackingNumber: trackingNumber,
+                sender: document.getElementById('sender-name').value,
+                recipient: document.getElementById('recipient-name').value,
+                status: 'pending',
+                lastUpdate: new Date().toLocaleString(),
+                weight: document.getElementById('parcel-weight').value + ' kg',
+                service: document.getElementById('service-type').options[document.getElementById('service-type').selectedIndex].text,
+                estDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                cost: costDisplay.textContent || '$0.00',
+                timeline: [
+                    { time: new Date().toLocaleString(), description: "Parcel received", location: "Main Office" }
+                ]
+            };
+            
+            // Add to sample data (in a real app, this would be saved to a database)
+            sampleParcels.unshift(newParcel);
+            
+            // Update tables
+            populateRecentParcelsTable();
+            populateAllParcelsTable();
+            
+            // Reset form
+            parcelForm.reset();
+            costDisplay.textContent = '';
+            
+            // Show success message
+            showSuccess(`Parcel created successfully! Tracking number: ${trackingNumber}`);
+        }
+
+        // Calculate shipping cost
+        function calculateCost() {
+            const weight = parseFloat(document.getElementById('parcel-weight').value) || 0;
+            const serviceType = document.getElementById('service-type').value;
+            
+            if (weight <= 0) {
+                alert('Please enter a valid weight');
+                return;
+            }
+            
+            if (!serviceType) {
+                alert('Please select a service type');
+                return;
+            }
+            
+            // Calculate cost based on weight and service type
+            let baseRate = 5.00;
+            let weightRate = 0.50;
+            let serviceMultiplier = 1.0;
+            
+            switch(serviceType) {
+                case 'express':
+                    serviceMultiplier = 1.5;
+                    break;
+                case 'overnight':
+                    serviceMultiplier = 2.0;
+                    break;
+                case 'international':
+                    serviceMultiplier = 2.5;
+                    break;
+            }
+            
+            const cost = (baseRate + (weight * weightRate)) * serviceMultiplier;
+            costDisplay.textContent = `$${cost.toFixed(2)}`;
+        }
+
+        // Customer management
+        function saveCustomer(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('customer-name').value;
+            const email = document.getElementById('customer-email').value;
+            const phone = document.getElementById('customer-phone').value;
+            
+            // Generate ID (in a real app, this would come from the database)
+            const id = sampleCustomers.length > 0 ? Math.max(...sampleCustomers.map(c => c.id)) + 1 : 1;
+            
+            // Create new customer object
+            const newCustomer = {
+                id: id,
+                name: name,
+                email: email,
+                phone: phone,
+                parcels: 0,
+                lastActivity: new Date().toISOString().split('T')[0]
+            };
+            
+            // Add to sample data
+            sampleCustomers.push(newCustomer);
+            
+            // Update table
+            populateCustomersTable();
+            
+            // Close modal and show success
+            customerModal.classList.remove('active');
+            showSuccess('Customer added successfully!');
+        }
+
+        function editCustomer(customerId) {
+            const customer = sampleCustomers.find(c => c.id == customerId);
+            if (customer) {
+                document.getElementById('customer-modal-title').textContent = 'Edit Customer';
+                document.getElementById('customer-name').value = customer.name;
+                document.getElementById('customer-email').value = customer.email;
+                document.getElementById('customer-phone').value = customer.phone;
+                document.getElementById('customer-address').value = customer.address || '';
+                customerModal.classList.add('active');
+                
+                // Update form submit handler for editing
+                customerForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    
+                    // Update customer data
+                    customer.name = document.getElementById('customer-name').value;
+                    customer.email = document.getElementById('customer-email').value;
+                    customer.phone = document.getElementById('customer-phone').value;
+                    customer.address = document.getElementById('customer-address').value;
+                    
+                    // Update table
+                    populateCustomersTable();
+                    
+                    // Close modal and show success
+                    customerModal.classList.remove('active');
+                    showSuccess('Customer updated successfully!');
+                    
+                    // Reset form handler
+                    customerForm.onsubmit = saveCustomer;
+                };
+            }
+        }
+
+        function deleteCustomer(customerId) {
+            if (confirm('Are you sure you want to delete this customer?')) {
+                const index = sampleCustomers.findIndex(c => c.id == customerId);
+                if (index !== -1) {
+                    sampleCustomers.splice(index, 1);
+                    populateCustomersTable();
+                    showSuccess('Customer deleted successfully!');
+                }
+            }
+        }
+
+        // Courier management
+        function saveCourier(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('courier-name').value;
+            const phone = document.getElementById('courier-phone').value;
+            const vehicle = document.getElementById('courier-vehicle').value;
+            const status = document.getElementById('courier-status').value;
+            
+            // Generate ID (in a real app, this would come from the database)
+            const id = sampleCouriers.length > 0 ? Math.max(...sampleCouriers.map(c => c.id)) + 1 : 1;
+            
+            // Create new courier object
+            const newCourier = {
+                id: id,
+                name: name,
+                vehicle: vehicle,
+                phone: phone,
+                deliveries: 0,
+                status: status
+            };
+            
+            // Add to sample data
+            sampleCouriers.push(newCourier);
+            
+            // Update table
+            populateCouriersTable();
+            
+            // Close modal and show success
+            courierModal.classList.remove('active');
+            showSuccess('Courier added successfully!');
+        }
+
+        function editCourier(courierId) {
+            const courier = sampleCouriers.find(c => c.id == courierId);
+            if (courier) {
+                document.getElementById('courier-modal-title').textContent = 'Edit Courier';
+                document.getElementById('courier-name').value = courier.name;
+                document.getElementById('courier-phone').value = courier.phone;
+                document.getElementById('courier-vehicle').value = courier.vehicle;
+                document.getElementById('courier-status').value = courier.status;
+                courierModal.classList.add('active');
+                
+                // Update form submit handler for editing
+                courierForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    
+                    // Update courier data
+                    courier.name = document.getElementById('courier-name').value;
+                    courier.phone = document.getElementById('courier-phone').value;
+                    courier.vehicle = document.getElementById('courier-vehicle').value;
+                    courier.status = document.getElementById('courier-status').value;
+                    
+                    // Update table
+                    populateCouriersTable();
+                    
+                    // Close modal and show success
+                    courierModal.classList.remove('active');
+                    showSuccess('Courier updated successfully!');
+                    
+                    // Reset form handler
+                    courierForm.onsubmit = saveCourier;
+                };
+            }
+        }
+
+        function deleteCourier(courierId) {
+            if (confirm('Are you sure you want to delete this courier?')) {
+                const index = sampleCouriers.findIndex(c => c.id == courierId);
+                if (index !== -1) {
+                    sampleCouriers.splice(index, 1);
+                    populateCouriersTable();
+                    showSuccess('Courier deleted successfully!');
+                }
+            }
+        }
+
+        // Settings functionality
+        function saveGeneralSettings(e) {
+            e.preventDefault();
+            showSuccess('General settings saved successfully!');
+        }
+
+        function saveNotificationSettings(e) {
+            e.preventDefault();
+            showSuccess('Notification preferences saved successfully!');
+        }
+
+        function saveShippingSettings(e) {
+            e.preventDefault();
+            showSuccess('Shipping rates saved successfully!');
+        }
+
+        // Search and filter
+        function filterParcels() {
+            const searchTerm = searchParcels.value.toLowerCase();
+            const rows = allParcelsTable.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Analytics
+        function initializeCharts() {
+            // Delivery performance chart
+            const deliveryCtx = document.getElementById('deliveryChart').getContext('2d');
+            const deliveryChart = new Chart(deliveryCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Parcels Delivered',
+                        data: [120, 150, 180, 200, 240, 220, 260],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Status distribution chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            const statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Delivered', 'In Transit', 'Pending', 'Out for Delivery', 'Returned'],
+                    datasets: [{
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: [
+                            '#2ecc71',
+                            '#3498db',
+                            '#f39c12',
+                            '#9b59b6',
+                            '#e74c3c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAnalytics() {
+            const period = analyticsPeriod.value;
+            // In a real app, this would fetch new data based on the selected period
+            showSuccess(`Analytics updated for ${period}`);
+        }
+
+        // Helper functions
+        function getStatusText(status) {
+            switch(status) {
+                case 'pending': return 'Pending';
+                case 'received': return 'Received';
+                case 'in-transit': return 'In Transit';
+                case 'out-for-delivery': return 'Out for Delivery';
+                case 'delivered': return 'Delivered';
+                case 'returned': return 'Returned';
+                default: return 'Unknown';
+            }
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'pending': return 'status-pending';
+                case 'received': return 'status-received';
+                case 'in-transit': return 'status-in-transit';
+                case 'out-for-delivery': return 'status-out-for-delivery';
+                case 'delivered': return 'status-delivered';
+                case 'returned': return 'status-returned';
+                default: return 'status-pending';
+            }
+        }
+
+        function showSuccess(message) {
+            document.getElementById('success-message').textContent = message;
+            successModal.classList.add('active');
+        }
+    </script>
+</body>
+</html>
